@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import styles from "./Game.module.css"
 import CharacterSelect from "./CharacterSelect";
 import Marker from "./Marker";
+import GameOver from "./GameOver";
 
 export default function Game(){
     const [clientX, setClientX] = useState(false);
@@ -9,25 +10,42 @@ export default function Game(){
     const [imgOffset, setImgOffset] = useState('');
     const [isClicked, setIsClicked] = useState(false);
     const [marker, setMarker] = useState([]);
+    const [markerSize, setMarkSize] = useState(50)
 
     const [title, setTitle] = useState(false)
     const [img, setImg] = useState('')
     const [characters, setCharacters] = useState(false);
 
+    const [gameOver, setGameOver] = useState(false)
+
     const setCoords = (e) => { 
         const rect = e.target.getBoundingClientRect();
-        console.log(rect.top)
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        console.log(x, y);
         setClientX(x);
         setClientY(y);
         setIsClicked(true);
     }
 
+    const compareCoords = ([x,y],[x2,y2]) => {
+        if (x >= x2 - markerSize / 2 && 
+            x <= x2 + markerSize / 2 && 
+            y >= y2 - markerSize / 2 && 
+            y <= y2 + markerSize / 2 ){
+            return true
+        } else return false
+    }
+
     function handleSelect(e){
-        const characterIndex = e.target.selectedIndex
-        setMarker(prev => [...prev, [clientX, clientY]])
+        const character = characters[e.target.id]
+        const result = compareCoords(character.coords, [clientX, clientY])
+        if (result){
+            character.found = true
+            setMarker(prev => [...prev, [clientX, clientY, "green"]])
+            setCharacters(prev => [...prev], character)
+        } else {
+            setMarker(prev => [...prev, [clientX, clientY, "red"]])
+        }
         setIsClicked(false)
     }
 
@@ -58,8 +76,6 @@ export default function Game(){
             setImgOffset([rect.left, rect.top]);
         };
 
-        console.log(image)
-
         if (image.complete) {
             handleImageLoad();
         } else {
@@ -76,17 +92,32 @@ export default function Game(){
         };
     }, []);
 
+    useEffect(() => {
+        if(!characters) return
+        const result = characters.filter(character => !character.found)
+
+        if(result.length <= 0){
+            setGameOver(true);
+        }
+    },[characters])
+
+    if(gameOver){
+        return(
+            <GameOver />    
+        )
+    }
+
     return(
         <div className={styles.game}>
             <h2>{title}</h2>
             <img src={img} id="img" />
             {isClicked && (
             <>
-                <Marker x={clientX} y={clientY} offset={imgOffset} />
-                <CharacterSelect x={clientX} y={clientY} offset={imgOffset} characters={characters} onSelect={handleSelect}/>
+                <Marker x={clientX} y={clientY} offset={imgOffset} markerSize={markerSize} />
+                <CharacterSelect x={clientX} y={clientY} offset={imgOffset} markerSize={markerSize} characters={characters} onSelect={handleSelect}/>
             </>
             )}
-            {marker.map((coords, idx) => <Marker x={coords[0]} y={coords[1]} offset={imgOffset} key={idx} color="green"/>)}
+            {marker.map((marker, idx) => <Marker x={marker[0]} y={marker[1]} offset={imgOffset} key={idx} color={marker[2]} markerSize={markerSize} />)}
         </div>
     )
 }
