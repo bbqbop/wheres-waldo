@@ -13,7 +13,6 @@ export default function useSendData(){
 
         try {
             const isFormData = data instanceof FormData;
-            console.log(isFormData)
             const response = await fetch(`${server}${url}`, {
                 method: method,
                 mode: "cors",

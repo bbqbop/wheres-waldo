@@ -6,6 +6,8 @@ import App from './App.jsx'
 import Game from './components/Game.jsx'
 import GameOver from './components/GameOver.jsx'
 import CreateGame from './components/CreateGame'
+import Games from './components/Games'
+import LoadingScreen from './components/LoadingScreen'
 
 const router = createBrowserRouter([
   {
@@ -13,8 +15,12 @@ const router = createBrowserRouter([
     element: <App />,
   },
   {
+    path: "/games",
+    element: <Games />
+  },
+  {
     path: "/game/:id",
-    element: <Game />,
+    element: <LoadingScreen />,
   },
   {
     path: "/game-over",

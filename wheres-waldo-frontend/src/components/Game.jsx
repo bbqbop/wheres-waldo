@@ -5,9 +5,12 @@ import Marker from "./Marker";
 import GameOver from "./GameOver";
 import CharacterInput from "./CharacterInput";
 import useSendData from "../hooks/useSendData";
+import { useNavigate } from "react-router-dom";
 
 export default function Game({ data, mode = 'play' }){
+    console.log(data)
     const { loading, error, sendData } = useSendData()
+    const navigate = useNavigate();
 
     const [clientX, setClientX] = useState(false);
     const [clientY, setClientY] = useState(false);
@@ -17,7 +20,7 @@ export default function Game({ data, mode = 'play' }){
     const [markerSize, setMarkSize] = useState(50)
 
     const [title, setTitle] = useState(false)
-    const [img, setImg] = useState('')
+    const [img, setImg] = useState(null)
     const [characters, setCharacters] = useState([]);
 
     const [gameOver, setGameOver] = useState(false)
@@ -56,19 +59,18 @@ export default function Game({ data, mode = 'play' }){
 
     const handleSubmit = async() => {
         const result = await sendData(`/game/${data._id}`, characters, "PUT")
-        console.log(result)
+        if(result) navigate("/");
     }
 
     function handleAddCharacter(e){
         e.preventDefault();
-
         const newCharacter = {
             name: e.target.character.value,
             coords: [clientX - imgOffset[0], clientY - imgOffset[1]]
         }
-        console.log(newCharacter)
         setCharacters(prev => [...prev, newCharacter])
-        console.log(characters)
+        setIsClicked(false)
+        setMarker(prev => [...prev, [clientX, clientY, 'green']])
     }
 
     useEffect(() => {
@@ -79,27 +81,11 @@ export default function Game({ data, mode = 'play' }){
         }
     },[data])
 
-    // useEffect(() => {
-    //      const fetchGame = async () => {
-    //         try {
-    //             const res = fetch("../../sample.json");
-    //             // if (!res.ok) {
-    //             //     throw new Error('Network response was not ok')
-    //             // }
-    //             const data = await (await res).json();
-    //             setTitle(data.title)
-    //             setImg(data.img)
-    //             setCharacters(data.characters.map(character => ({ ...character, found: false })));
-    //         } catch (error) {
-    //             console.error('Failed to fetch JSON file', error)
-    //         }
-    //      }
-
-    //      fetchGame()
-    // },[])
-
     useEffect(() => {
+        if(!img) return
+
         const image = document.getElementById("img");
+        if(!image) return
         image.addEventListener('load', handleLoad)
 
        function handleLoad(){
@@ -129,15 +115,11 @@ export default function Game({ data, mode = 'play' }){
         )
     }
 
-    if(error){
-        return(
-            <p>Error</p>
-        )
-    }
-
     return(
         <div className={styles.game}>
             <h1>{title}</h1>
+            {loading && <p>'...loading'</p>}
+            {error && <p>{error.message}</p>}
             {mode == "setup" && 
                 <>
                     <h3>Mark characters!</h3>

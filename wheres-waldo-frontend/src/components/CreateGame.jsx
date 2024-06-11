@@ -32,7 +32,6 @@ export default function CreateGame(){
     }
 
     if (data){
-        console.log(data)
         const { game } = data
         return (
             <Game data={game} mode="setup" />
@@ -67,7 +66,7 @@ export default function CreateGame(){
                 </div>
             )}
             {loading && <p>'...loading'</p>}
-            {error && <p>{error}</p>}
+            {error && <p>{error.message}</p>}
         </div>
     )
 }
