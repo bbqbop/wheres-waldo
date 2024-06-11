@@ -37,6 +37,18 @@ exports.update = asyncHandler(async (req, res) => {
 
     game.characters.push(...characters);
 
-    game.save()
+    const result = await game.save()
+    console.log(result)
     res.json({message: "Upload successful!", game})
+})
+
+exports.read = asyncHandler(async (req, res) => {
+    const gameId = req.params.id
+    const game = await Game.findById(gameId)
+
+    if (!game) {
+        throw new Error("Game not found")
+    }
+
+    res.json({ message: "Game found!", game })
 })
