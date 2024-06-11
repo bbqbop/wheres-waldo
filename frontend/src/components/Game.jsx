@@ -20,18 +20,19 @@ export default function Game(){
 
     const setCoords = (e) => { 
         const rect = e.target.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const x = e.pageX;
+        const y = e.pageY;
+
         setClientX(x);
         setClientY(y);
         setIsClicked(true);
     }
 
     const compareCoords = ([x,y],[x2,y2]) => {
-        if (x >= x2 - markerSize / 2 && 
-            x <= x2 + markerSize / 2 && 
-            y >= y2 - markerSize / 2 && 
-            y <= y2 + markerSize / 2 ){
+        if (x >= x2 - markerSize / 2 - imgOffset[0] && 
+            x <= x2 + markerSize / 2 - imgOffset[0] && 
+            y >= y2 - markerSize / 2 - imgOffset[1] && 
+            y <= y2 + markerSize / 2 - imgOffset[1] ){
             return true
         } else return false
     }
@@ -70,27 +71,18 @@ export default function Game(){
 
     useEffect(() => {
         const image = document.getElementById("img");
+        image.addEventListener('load', handleLoad)
 
-        const handleImageLoad = () => {
+       function handleLoad(){
             const rect = image.getBoundingClientRect();
-            setImgOffset([rect.left, rect.top]);
-        };
-
-        if (image.complete) {
-            handleImageLoad();
-        } else {
-            image.addEventListener('load', handleImageLoad);
+            setImgOffset([rect.left,rect.top])
+            image.addEventListener('click', setCoords)
         }
-
-        window.addEventListener('resize', handleImageLoad);
-        image.addEventListener("click", setCoords);
-
-        return () => {
-            image.removeEventListener('click', setCoords);
-            image.removeEventListener('load', handleImageLoad);
-            window.removeEventListener('resize', handleImageLoad);
-        };
-    }, []);
+        return(()=>{
+            image.removeEventListener('click', setCoords)
+            image.removeEventListener('load', handleLoad)
+        })
+    }, [img]);
 
     useEffect(() => {
         if(!characters) return
@@ -109,12 +101,12 @@ export default function Game(){
 
     return(
         <div className={styles.game}>
-            <h2>{title}</h2>
+            <h1>{title}</h1>
             <img src={img} id="img" />
             {isClicked && (
             <>
-                <Marker x={clientX} y={clientY} offset={imgOffset} markerSize={markerSize} />
-                <CharacterSelect x={clientX} y={clientY} offset={imgOffset} markerSize={markerSize} characters={characters} onSelect={handleSelect}/>
+                <Marker x={clientX} y={clientY} markerSize={markerSize} />
+                <CharacterSelect x={clientX} y={clientY} markerSize={markerSize} characters={characters} onSelect={handleSelect}/>
             </>
             )}
             {marker.map((marker, idx) => <Marker x={marker[0]} y={marker[1]} offset={imgOffset} key={idx} color={marker[2]} markerSize={markerSize} />)}
