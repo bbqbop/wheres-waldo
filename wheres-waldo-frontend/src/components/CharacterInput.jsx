@@ -1,7 +1,7 @@
-export default function CharacterInput({ x, y, markerSize, addCharacter }){
+export default function CharacterInput({ x, y, imgOffset, markerSize, addCharacter }){
     const style = {
-        left: `${x + markerSize / 2}px`,
-        top: `${y - markerSize / 2}px`,
+        left: `${x + imgOffset[0] + markerSize / 2}px`,
+        top: `${y + imgOffset[1] - markerSize / 2}px`,
         position: "absolute",
         boxSizing: 'border-box',
         zIndex: 1000,

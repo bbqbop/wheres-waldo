@@ -8,13 +8,12 @@ import useSendData from "../hooks/useSendData";
 import { useNavigate } from "react-router-dom";
 
 export default function Game({ data, mode = 'play' }){
-    console.log(data)
     const { loading, error, sendData } = useSendData()
     const navigate = useNavigate();
 
     const [clientX, setClientX] = useState(false);
     const [clientY, setClientY] = useState(false);
-    const [imgOffset, setImgOffset] = useState('');
+    const [imgOffset, setImgOffset] = useState([0, 0]);
     const [isClicked, setIsClicked] = useState(false);
     const [marker, setMarker] = useState([]);
     const [markerSize, setMarkSize] = useState(50)
@@ -26,9 +25,8 @@ export default function Game({ data, mode = 'play' }){
     const [gameOver, setGameOver] = useState(false)
 
     const setCoords = (e) => { 
-        const rect = e.target.getBoundingClientRect();
-        const x = e.pageX;
-        const y = e.pageY;
+        const x = e.offsetX;
+        const y = e.offsetY;
 
         setClientX(x);
         setClientY(y);
@@ -36,10 +34,10 @@ export default function Game({ data, mode = 'play' }){
     }
 
     const compareCoords = ([x,y],[x2,y2]) => {
-        if (x >= x2 - markerSize / 2 - imgOffset[0] && 
-            x <= x2 + markerSize / 2 - imgOffset[0] && 
-            y >= y2 - markerSize / 2 - imgOffset[1] && 
-            y <= y2 + markerSize / 2 - imgOffset[1] ){
+        if (x >= x2 - markerSize / 2 && 
+            x <= x2 + markerSize / 2 && 
+            y >= y2 - markerSize / 2 && 
+            y <= y2 + markerSize / 2 ){
             return true
         } else return false
     }
@@ -66,7 +64,7 @@ export default function Game({ data, mode = 'play' }){
         e.preventDefault();
         const newCharacter = {
             name: e.target.character.value,
-            coords: [clientX - imgOffset[0], clientY - imgOffset[1]]
+            coords: [clientX, clientY]
         }
         setCharacters(prev => [...prev, newCharacter])
         setIsClicked(false)
@@ -79,7 +77,7 @@ export default function Game({ data, mode = 'play' }){
         if(mode == 'play'){
             setCharacters(data.characters.map(character => ({ ...character, found: false })))
         }
-    },[data])
+    },[data, mode])
 
     useEffect(() => {
         if(!img) return
@@ -90,7 +88,7 @@ export default function Game({ data, mode = 'play' }){
 
        function handleLoad(){
             const rect = image.getBoundingClientRect();
-            setImgOffset([rect.left,rect.top])
+            setImgOffset([window.scrollX + rect.left, window.scrollY + rect.top]);
             image.addEventListener('click', setCoords)
         }
         return(()=>{
@@ -100,14 +98,23 @@ export default function Game({ data, mode = 'play' }){
     }, [img]);
 
     useEffect(() => {
-        if(mode != 'play') return
-        if(!characters) return
+        if(mode != 'play' || !characters.length) return
+
+        const allCharactersHaveFoundProperty = characters.every(character => character.hasOwnProperty('found'));
+        if(!allCharactersHaveFoundProperty) return
+
         const result = characters.filter(character => !character.found)
 
         if(result.length <= 0){
             setGameOver(true);
         }
-    },[characters])
+    },[characters, mode])
+
+    useEffect(() => {
+        const image = document.getElementById("img");
+        const rect = image.getBoundingClientRect();
+        setImgOffset([window.scrollX + rect.left, window.scrollY + rect.top]);
+    },[isClicked])
 
     if(gameOver){
         return(
@@ -129,12 +136,12 @@ export default function Game({ data, mode = 'play' }){
             <img src={img} id="img" />
             {isClicked && (
             <>
-                <Marker x={clientX} y={clientY} markerSize={markerSize} />
-                {mode == "play" ? <CharacterSelect x={clientX} y={clientY} markerSize={markerSize} characters={characters} onSelect={handleSelect}/>
-                                : <CharacterInput x={clientX} y={clientY} markerSize={markerSize} addCharacter={handleAddCharacter}/>}
+                <Marker x={clientX} y={clientY} markerSize={markerSize} imgOffset={imgOffset} />
+                {mode == "play" ? <CharacterSelect x={clientX} y={clientY} imgOffset={imgOffset} markerSize={markerSize} characters={characters} onSelect={handleSelect}/>
+                                : <CharacterInput x={clientX} y={clientY}imgOffset={imgOffset} markerSize={markerSize} addCharacter={handleAddCharacter}/>}
             </>
             )}
-            {marker.map((marker, idx) => <Marker x={marker[0]} y={marker[1]} offset={imgOffset} key={idx} color={marker[2]} markerSize={markerSize} />)}
+            {marker.map((marker, idx) => <Marker x={marker[0]} y={marker[1]} imgOffset={imgOffset} key={idx} color={marker[2]} markerSize={markerSize} />)}
         </div>
     )
 }

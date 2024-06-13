@@ -1,7 +1,7 @@
-export default function Marker({ className, x, y, offset, color = 'white', markerSize}){
+export default function Marker({ x, y, imgOffset, color = 'white', markerSize}){
   const style = {
-      left: `${x - markerSize / 2}px`,
-      top: `${y - markerSize / 2}px`,
+      left: `${x + imgOffset[0] - markerSize / 2}px`,
+      top: `${y + imgOffset[1] - markerSize / 2}px`,
       position: 'absolute',
       borderColor: color,
       width: `${markerSize}px`,
