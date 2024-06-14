@@ -22,6 +22,7 @@ export default function Game({ data, mode = 'play' }){
     const [img, setImg] = useState(null)
     const [characters, setCharacters] = useState([]);
 
+    const [timer, setTimer] = useState(0)
     const [gameOver, setGameOver] = useState(false)
 
     const setCoords = (e) => { 
@@ -111,6 +112,20 @@ export default function Game({ data, mode = 'play' }){
     },[characters, mode])
 
     useEffect(() => {
+        if (mode != 'play') return
+
+        const incrementTimer = () => {
+            setTimer(prev => prev + 1)
+        }
+
+        const interval = setInterval(incrementTimer,1000)
+
+        if (gameOver) clearInterval(interval)
+        return (() => clearInterval(interval))
+
+    },[mode, gameOver])
+
+    useEffect(() => {
         const image = document.getElementById("img");
         const rect = image.getBoundingClientRect();
         setImgOffset([window.scrollX + rect.left, window.scrollY + rect.top]);
@@ -118,13 +133,14 @@ export default function Game({ data, mode = 'play' }){
 
     if(gameOver){
         return(
-            <GameOver />    
+            <GameOver time={timer}/>    
         )
     }
 
     return(
         <div className={styles.game}>
             <h1>{title}</h1>
+            <p>{timer}</p>
             {loading && <p>'...loading'</p>}
             {error && <p>{error.message}</p>}
             {mode == "setup" && 
