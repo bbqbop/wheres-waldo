@@ -24,8 +24,10 @@ export default function useSendData(){
                 throw new Error(result.message || "Something went wrong")
             }
             const result = await response.json();
+
+            console.log(result)
             setData(result)
-            return true;
+            return result;
         } catch (error) {
             setError(error)
             return false;

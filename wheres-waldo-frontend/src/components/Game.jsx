@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import styles from "./Game.module.css"
 import CharacterSelect from "./CharacterSelect";
 import Marker from "./Marker";
@@ -23,6 +23,7 @@ export default function Game({ data, mode = 'play' }){
     const [characters, setCharacters] = useState([]);
 
     const [timer, setTimer] = useState(0)
+    const startTimeRef = useRef(null);
     const [gameOver, setGameOver] = useState(false)
 
     const setCoords = (e) => { 
@@ -114,14 +115,23 @@ export default function Game({ data, mode = 'play' }){
     useEffect(() => {
         if (mode != 'play') return
 
-        const incrementTimer = () => {
-            setTimer(prev => prev + 1)
+        if (!startTimeRef.current) {
+            startTimeRef.current = Date.now()
         }
 
-        const interval = setInterval(incrementTimer,1000)
+        const incrementTimer = () => {
+            const elapsedTime = (Date.now() - startTimeRef.current) / 1000
+            setTimer(elapsedTime.toFixed(1));
+        }
 
-        if (gameOver) clearInterval(interval)
-        return (() => clearInterval(interval))
+        const interval = setInterval(incrementTimer, 100);
+
+        if (gameOver) {
+            clearInterval(interval);
+            startTimeRef.current = null;
+        }
+
+        return () => clearInterval(interval);
 
     },[mode, gameOver])
 
@@ -133,7 +143,7 @@ export default function Game({ data, mode = 'play' }){
 
     if(gameOver){
         return(
-            <GameOver time={timer}/>    
+            <GameOver time={timer} gameId = {data._id} gameScores = {data.scores} />    
         )
     }
 

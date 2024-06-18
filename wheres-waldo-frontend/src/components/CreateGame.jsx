@@ -1,8 +1,12 @@
 import { useState } from "react"
+import { useAuth } from "../contexts/authContext";
+import { Link } from "react-router-dom";
 import useSendData from "../hooks/useSendData"
 import Game from "./Game";
 
 export default function CreateGame(){
+    const { isLoggedIn } = useAuth()
+
     const { loading, error, data, sendData } = useSendData()
 
     const [title, setTitle] = useState('');
@@ -28,7 +32,17 @@ export default function CreateGame(){
         formData.append('title', title),
         formData.append('image', image)
 
-        const result = await sendData('/game', formData)
+        const result = await sendData('/games', formData)
+    }
+
+    if (!isLoggedIn){
+        return (
+            <>
+                <h2>Login to create games!</h2>
+                <Link to="/login">Login</Link>
+                <Link to="/">Home</Link>
+            </>
+        )
     }
 
     if (data){
