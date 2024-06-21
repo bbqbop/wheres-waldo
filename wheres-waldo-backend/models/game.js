@@ -11,6 +11,14 @@ const gameSchema = new mongoose.Schema({
         coords: {
             type: [Number]
         }
+    }],
+    author: {type: mongoose.Types.ObjectId, ref: "User" },
+    date: { type: Date, default: Date.now },
+    scores: [{
+        username: { type: String, required: true },
+        user_id: { type: mongoose.Types.ObjectId, ref: "User" },
+        score: { type: Number, required: true },
+        date: { type: Date, default: Date.now }
     }]
 })
 
