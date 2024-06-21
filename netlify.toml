@@ -1,0 +1,17 @@
+# netlify.toml
+
+# Build settings
+[build]
+  # Directory to change to before starting build.
+  base = "wheres-waldo-frontend"
+
+  # Build command.
+  command = "npm run build"
+
+  # Directory to publish (relative to root of your repository).
+  publish = "dist"
+
+# Specify the Node.js version to use for building your site.
+# Use a Node.js version that is compatible with your build process.
+[build.environment]
+  NODE_VERSION = "14"
