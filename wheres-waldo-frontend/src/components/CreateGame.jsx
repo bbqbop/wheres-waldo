@@ -33,7 +33,7 @@ export default function CreateGame(){
         formData.append('title', title),
         formData.append('image', image)
 
-        const result = await sendData('/games', formData)
+        await sendData('/games', formData)
     }
 
     if (!isLoggedIn){
