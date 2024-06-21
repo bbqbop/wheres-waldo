@@ -4,7 +4,7 @@ import CharacterSelect from "./CharacterSelect";
 import Marker from "./Marker";
 import GameOver from "./GameOver";
 import CharacterInput from "./CharacterInput";
-import useSendData from "../hooks/useSendData";
+import useSendData from "../hooks/useData";
 import { useNavigate } from "react-router-dom";
 
 export default function Game({ data, mode = 'play' }){
@@ -13,22 +13,31 @@ export default function Game({ data, mode = 'play' }){
 
     const [clientX, setClientX] = useState(false);
     const [clientY, setClientY] = useState(false);
-    const [imgOffset, setImgOffset] = useState([0, 0]);
     const [isClicked, setIsClicked] = useState(false);
     const [marker, setMarker] = useState([]);
-    const [markerSize, setMarkSize] = useState(50)
 
     const [title, setTitle] = useState(false)
     const [img, setImg] = useState(null)
     const [characters, setCharacters] = useState([]);
+    const [scores, setScores] = useState(false)
 
     const [timer, setTimer] = useState(0)
     const startTimeRef = useRef(null);
     const [gameOver, setGameOver] = useState(false)
 
+    const markerSize = 50
+
+    const reset = (e, updatedScores) => {
+        setTimer(0)
+        setGameOver(false)
+        setMarker([])
+        setIsClicked(false)
+        setScores(updatedScores)
+    }
+
     const setCoords = (e) => { 
-        const x = e.offsetX;
-        const y = e.offsetY;
+        const x = e.layerX;
+        const y = e.layerY;
 
         setClientX(x);
         setClientY(y);
@@ -73,13 +82,27 @@ export default function Game({ data, mode = 'play' }){
         setMarker(prev => [...prev, [clientX, clientY, 'green']])
     }
 
+    function handleDeleteCharacter(idx){
+        console.log(idx)
+        setCharacters((prev) => {
+            const newArray = [...prev];
+            newArray.splice(idx, 1)
+            return newArray
+        })
+        setMarker((prev) => {
+            const newArray = [...prev];
+            newArray.splice(idx, 1)
+            return newArray
+        })
+    }
+
     useEffect(() => {
         setImg(data.image.url)
         setTitle(data.title)
         if(mode == 'play'){
             setCharacters(data.characters.map(character => ({ ...character, found: false })))
         }
-    },[data, mode])
+    },[data, mode, gameOver])
 
     useEffect(() => {
         if(!img) return
@@ -89,15 +112,12 @@ export default function Game({ data, mode = 'play' }){
         image.addEventListener('load', handleLoad)
 
        function handleLoad(){
-            const rect = image.getBoundingClientRect();
-            setImgOffset([window.scrollX + rect.left, window.scrollY + rect.top]);
             image.addEventListener('click', setCoords)
         }
         return(()=>{
             image.removeEventListener('click', setCoords)
-            image.removeEventListener('load', handleLoad)
         })
-    }, [img]);
+    }, [img, gameOver]);
 
     useEffect(() => {
         if(mode != 'play' || !characters.length) return
@@ -135,39 +155,45 @@ export default function Game({ data, mode = 'play' }){
 
     },[mode, gameOver])
 
-    useEffect(() => {
-        const image = document.getElementById("img");
-        const rect = image.getBoundingClientRect();
-        setImgOffset([window.scrollX + rect.left, window.scrollY + rect.top]);
-    },[isClicked])
-
     if(gameOver){
         return(
-            <GameOver time={timer} gameId = {data._id} gameScores = {data.scores} />    
+            <GameOver time={timer} gameId = {data._id} gameScores = {scores || data.scores} reset={reset} />    
         )
     }
 
     return(
-        <div className={styles.game}>
-            <h1>{title}</h1>
-            <p>{timer}</p>
-            {loading && <p>'...loading'</p>}
-            {error && <p>{error.message}</p>}
-            {mode == "setup" && 
+        <div className={styles.body}>
+            <div className={styles.title}>
+                <h1>{title}</h1>
+                {mode == 'play' && <p>{timer}</p>}
+                {loading && <p>'...loading'</p>}
+                {error && <p>{error.message}</p>}
+                {mode == "setup" && 
+                    <div className={styles.setup}>
+                        <div>
+                            <h3>Mark characters!</h3>
+                            {characters.length >= 1 && <button onClick={handleSubmit}>Submit</button>}  
+                        </div>
+                        {characters.map((character, idx) => (
+                            <div key={idx} className={styles.characters}>
+                                <p>{character.name}</p>
+                                <button onClick={() => handleDeleteCharacter(idx)}>Delete</button>
+                            </div>
+                        ))}  
+                    </div>
+                }
+            </div>
+            <div className={styles.game}>
+                <img src={img} id="img" />
+                {isClicked && (
                 <>
-                    <h3>Mark characters!</h3>
-                    {characters.length >= 1 && <button onClick={handleSubmit}>Submit</button>}    
+                    <Marker x={clientX} y={clientY} markerSize={markerSize} />
+                    {mode == "play" ? <CharacterSelect x={clientX} y={clientY} markerSize={markerSize} characters={characters} onSelect={handleSelect}/>
+                                    : <CharacterInput x={clientX} y={clientY} markerSize={markerSize}  addCharacter={handleAddCharacter}/>}
                 </>
-            }
-            <img src={img} id="img" />
-            {isClicked && (
-            <>
-                <Marker x={clientX} y={clientY} markerSize={markerSize} imgOffset={imgOffset} />
-                {mode == "play" ? <CharacterSelect x={clientX} y={clientY} imgOffset={imgOffset} markerSize={markerSize} characters={characters} onSelect={handleSelect}/>
-                                : <CharacterInput x={clientX} y={clientY}imgOffset={imgOffset} markerSize={markerSize} addCharacter={handleAddCharacter}/>}
-            </>
-            )}
-            {marker.map((marker, idx) => <Marker x={marker[0]} y={marker[1]} imgOffset={imgOffset} key={idx} color={marker[2]} markerSize={markerSize} />)}
+                )}
+                {marker.map((marker, idx) => <Marker x={marker[0]} y={marker[1]} markerSize={markerSize} key={idx} color={marker[2]} />)}
+            </div>
         </div>
     )
 }

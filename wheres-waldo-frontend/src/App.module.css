@@ -1,5 +1,6 @@
 html {
     box-sizing: border-box;
+    text-align: center;
 }
 
 *, *:before, *:after {
@@ -9,8 +10,10 @@ html {
 }
 
 .app {
+    display: grid;
+    grid-template-rows: 100px 1fr 1em;
     position: relative;
     height: 100vh;
     width: 100vw;
-    background-color: aquamarine;
 }
+

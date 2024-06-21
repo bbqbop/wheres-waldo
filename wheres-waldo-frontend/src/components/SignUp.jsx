@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/authContext"
+import styles from "./forms.module.css"
 
 export default function SignUp(){
     const [username, setUsername] = useState('');
@@ -8,6 +9,8 @@ export default function SignUp(){
     const [firstname, setFirstname] = useState('');
     const [lastname, setLastname] = useState('');
     const [localError, setLocalError] = useState('');
+
+    const { isLoggedIn } = useAuth();
 
     const { signUp, loading, error, clearError } = useAuth();
     const navigate = useNavigate()
@@ -38,7 +41,7 @@ export default function SignUp(){
     }
 
     return(
-        <>
+        <div className={styles.body}>
             <p>Sign up</p>
             <form onSubmit={handleSubmit}>
                 <input 
@@ -79,9 +82,10 @@ export default function SignUp(){
                 />
                 <button type="submit">Submit</button>
             </form>
+            
             {loading && <p>Loading...</p>}
             {error && <p>{error}</p>}
             {localError && <p>{localError}</p>}
-        </>
+        </div>
     )
 }

@@ -1,7 +1,49 @@
+.body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: auto;
+}
+
+.title { 
+    padding-left: 12vw;
+    text-align: left;
+    width: 100%;
+}
+
 .game {
     position: relative;
 }
 
 body {
     box-sizing: border-box;
+}
+
+.body img { 
+    padding: 20px;
+    box-shadow: 5px 5px 5px grey;
+    border-radius: 5px;
+}
+
+.setup {
+    width: 80vw;
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 10vw;
+    gap: 1vw;
+}
+
+.characters{
+    box-shadow: 5px 5px 5px grey;
+    background-color: rgb(100, 108, 255, 0.6);
+    border: solid 1px;
+    border-radius: 5px;
+}
+
+.characters button {
+    transform: scale(70%);
+}
+
+.characters:hover {
+    background-color: rgb(0, 86, 179, 0.6);
 }

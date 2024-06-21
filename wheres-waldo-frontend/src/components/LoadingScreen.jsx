@@ -1,10 +1,10 @@
 import { useParams } from "react-router-dom"
-import useGetData from "../hooks/useGetData"
+import useData from "../hooks/useData"
 import { useEffect } from "react"
 import Game from "./Game"
 
 export default function LoadingScreen(){
-    const { loading, error, data, getData } = useGetData()
+    const { loading, error, data, getData } = useData()
 
     const { id } = useParams()
 

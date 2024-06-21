@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/authContext';
+import styles from './forms.module.css'
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -34,7 +35,7 @@ export default function Login() {
   },[])
 
   return (
-    <>
+    <div className={styles.body}>
       <p>Login</p>
       <form onSubmit={handleSubmit}>
         <input 
@@ -54,15 +55,16 @@ export default function Login() {
           onChange={e => setPassword(e.target.value)} 
         />
         <button type="submit" disabled={loading}>Submit</button>
-        {loading && <p>Loading...</p>}
-        {error && <p>{error}</p>}
-        {localError && <p>{localError}</p>}
       </form>
-      <hr />
+      <hr/>
       <p>Not registered yet?</p>
       <Link to="/sign-up">Sign-Up </Link>
+
+      {loading && <p>Loading...</p>}
+      {error && <p>{error}</p>}
+      {localError && <p>{localError}</p>}
       
-      <Link to="/">Home</Link>
-    </>
+
+    </div>
   );
 }

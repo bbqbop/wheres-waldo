@@ -1,0 +1,53 @@
+.games {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.game {
+    position: relative;
+    margin: 5px;
+    box-shadow: 5px 5px 5px grey;
+    border: solid 1px;
+    border-radius: 5px;
+    width: 220px;
+    height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 10px;
+}
+
+.gameLink {
+    position: relative; /* Ensure relative positioning for pseudo elements */
+    display: block; /* Ensure the link takes full width/height of parent */
+    text-decoration: none; /* Remove default underline */
+    color: inherit; /* Inherit color */
+}
+
+.scoreboard {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%; /* Take full width of parent */
+    background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent background */
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
+}
+
+.game:hover .scoreboard {
+    display: block;
+}
+
+.game img {
+    flex: 1;
+}
+
+.game:hover {
+    cursor: pointer;
+    box-shadow: none;
+    background-color: lightgrey;
+}

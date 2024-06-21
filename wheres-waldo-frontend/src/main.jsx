@@ -11,36 +11,41 @@ import LoadingScreen from './components/LoadingScreen'
 import { AuthProvider } from './contexts/authContext'
 import SignUp from './components/SignUp'
 import Login from './components/Login'
+import NavBar from './components/NavBar'
+import HomeScreen from './components/HomeScreen'
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    children: [
+      { index: true, element: <HomeScreen />},
+      {
+        path: "/games",
+        element: <Games />
+      },
+      {
+        path: "/game/:id",
+        element: <LoadingScreen />,
+      },
+      {
+        path: "/game-over",
+        element: <GameOver />,
+      },
+      {
+        path: "/create-game",
+        element: <CreateGame />
+      },
+      {
+        path: "/login",
+        element: <Login />
+      },
+      {
+        path: "/sign-up",
+        element: <SignUp />
+      }
+    ]
   },
-  {
-    path: "/games",
-    element: <Games />
-  },
-  {
-    path: "/game/:id",
-    element: <LoadingScreen />,
-  },
-  {
-    path: "/game-over",
-    element: <GameOver />,
-  },
-  {
-    path: "/create-game",
-    element: <CreateGame />
-  },
-  {
-    path: "/login",
-    element: <Login />
-  },
-  {
-    path: "/sign-up",
-    element: <SignUp />
-  }
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(

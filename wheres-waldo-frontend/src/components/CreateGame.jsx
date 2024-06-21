@@ -1,8 +1,9 @@
 import { useState } from "react"
 import { useAuth } from "../contexts/authContext";
 import { Link } from "react-router-dom";
-import useSendData from "../hooks/useSendData"
+import useSendData from "../hooks/useData"
 import Game from "./Game";
+import styles from "./forms.module.css"
 
 export default function CreateGame(){
     const { isLoggedIn } = useAuth()
@@ -37,11 +38,11 @@ export default function CreateGame(){
 
     if (!isLoggedIn){
         return (
-            <>
+            <div>
                 <h2>Login to create games!</h2>
-                <Link to="/login">Login</Link>
-                <Link to="/">Home</Link>
-            </>
+                <hr />
+                <Link to="/login">Login </Link>
+            </div>
         )
     }
 
@@ -53,9 +54,9 @@ export default function CreateGame(){
     }
 
     return (
-        <div className="createGame">
+        <div className={styles.body}>
             <form onSubmit={handleSubmit} encType="multipart/form-data">
-                <label>Input title
+                <label>Game title
                     <input 
                         type="text"
                         name="title" 
@@ -64,14 +65,18 @@ export default function CreateGame(){
                         onChange={(e)=>setTitle(e.target.value)}
                         required 
                     />
+                </label>
+                <label className={styles.customFileInput}>Upload Image
                     <input 
+                        className={styles.fileInput}
                         type="file" 
                         accept="image/*" 
                         placeholder="Upload Image" 
                         onChange={handleImageChange}
-                        required/>
-                    <button type="submit">Submit</button>
+                        required
+                    />
                 </label>
+                    <button type="submit">Submit</button>
             </form>
             {imagePreview && (
                 <div>
@@ -81,6 +86,11 @@ export default function CreateGame(){
             )}
             {loading && <p>'...loading'</p>}
             {error && <p>{error.message}</p>}
+
+            <hr />
+
+            <Link to="/">Home </Link>
+
         </div>
     )
 }

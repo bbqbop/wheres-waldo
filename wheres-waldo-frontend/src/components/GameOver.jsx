@@ -1,11 +1,11 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/authContext";
-import useSendData from "../hooks/useSendData";
+import useSendData from "../hooks/useData";
 import ScoreForm from "./ScoreForm";
 
-export default function GameOver({ time, gameId, gameScores }) {
+export default function GameOver({ time, gameId, gameScores, reset }) {
     const { isLoggedIn, user } = useAuth();
     const { sendData, loading, error, data } = useSendData();
     const [localError, setLocalError] = useState('');
@@ -13,9 +13,7 @@ export default function GameOver({ time, gameId, gameScores }) {
     const [isClicked, setIsClicked] = useState(false);
     const [scores, setScores] = useState([]);
     const [isHighScore, setIsHighScore] = useState(false);
-    const [formIsRendered, setFormIsRendered] = useState(false);
-
-    const navigate = useNavigate();
+    const [scorePos, setScorePos] = useState(null)
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -23,26 +21,15 @@ export default function GameOver({ time, gameId, gameScores }) {
         const success = await sendData(`/game/${gameId}/scores`, { username, score: time }, 'PUT');
         if (success) {
             setLocalError(success.message);
-            setTimeout(() => {
-                navigate("/");
-            }, 1000);
+            setScores(prev => {
+                const newArray = [...prev]
+                newArray[scorePos].username = username
+                return newArray
+            })
         } else {
             setIsClicked(false);
         }
     };
-
-    function renderScoreForm(){
-        return (
-            <li key="newScore">
-                <ScoreForm 
-                    handleSubmit={handleSubmit} 
-                    username={username} 
-                    setUsername={setUsername} 
-                    isClicked={isClicked} 
-                />
-            </li>
-        )
-    }
 
     useEffect(() => {
         setLocalError('');
@@ -57,9 +44,14 @@ export default function GameOver({ time, gameId, gameScores }) {
         newArray.sort((a, b) => a.score - b.score)
         setScores(newArray);
 
+        newArray.find((entry, idx) => {
+            if(entry.username == 'userScore') setScorePos(idx)
+        })
+
         if (newArray[0].username == 'userScore'){
             setIsHighScore(true)
         } 
+
     }, [gameScores, time]);
 
     return (
@@ -67,14 +59,10 @@ export default function GameOver({ time, gameId, gameScores }) {
             {isHighScore && <h2>NEW HIGHSCORE!</h2>}
             You've found all the characters in {time} seconds
 
-            {loading && <p>'...loading'</p>}
-            {error && <p>{error.message}</p>}
-            {localError && <p>{localError}</p>}
-
             <ol style={{ listStyle: 'decimal', paddingLeft: "20px" }}>
                 {scores.map((score, idx) => (
                     <li key={idx}>
-                        {score.username == 'userScore' 
+                        {score.username == "userScore"
                         ? <ScoreForm handleSubmit={handleSubmit} username={username} setUsername={setUsername} isClicked={isClicked}/>
                         : `${score.username} : ${score.score}`
                         }
@@ -82,7 +70,12 @@ export default function GameOver({ time, gameId, gameScores }) {
                 ))}
             </ol>
 
-            <a href="/">Home</a>
+            <hr />            
+            <a onClick={(e) => reset(e, scores)}>Play-again </a>
+
+            {loading && <p>'...loading'</p>}
+            {error && <p>{error.message}</p>}
+            {localError && <p>{localError}</p>}
         </div>
     );
 }

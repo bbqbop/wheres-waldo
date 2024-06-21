@@ -1,0 +1,23 @@
+.navbar {
+    width: 100vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user {
+    background-color: rgba(100, 108, 255, 0.2);
+    border-radius: 5px;
+    margin-right: 10vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1em;
+}
+
+.navbar a {
+    display: flex;
+    align-items: center;
+    padding-left: 10vw;
+}
+
