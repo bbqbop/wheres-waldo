@@ -39,10 +39,17 @@ exports.readAll = asyncHandler(async (req, res) => {
 exports.create = asyncHandler(async (req, res) => {
     const imgResult = await cloudinary.uploadStream(req.file.buffer)
     if (!imgResult) throw new Error("Error uploading image.")
+
     const { title } = req.body
     const image = {
-        url: imgResult.url,
-        public_id: imgResult.public_id 
+        original: {
+            url: imgResult.original.url,
+            public_id: imgResult.original.public_id 
+        },
+        preview: {
+            url: imgResult.preview.url,
+            public_id: imgResult.preview.public_id
+        }
     }
 
     const game = new Game({

@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler')
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
+const sharp = require('sharp');
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -9,25 +10,48 @@ cloudinary.config({
 });
 
 const uploadStream = asyncHandler(async (bufferImg) => {
-    return new Promise((resolve, reject) => {
-        streamifier.createReadStream(bufferImg).pipe(
-            cloudinary.uploader.upload_stream(
-                {
-                    folder: "wheres-waldo",
-                    transformation: [
-                        { width: 1200, crop: "scale" },
-                    ]
-                },
-                function (error, result) {
-                    if (error) {
-                        reject(error);
-                    } else {
-                        resolve(result);
+    // Get the image dimensions
+    const metadata = await sharp(bufferImg).metadata();
+    const imgWidth = metadata.width
+    
+    const upload = (buffer, transformationOptions) => {
+        return new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                reject(new Error("Upload timed out"));
+            }, 10000)
+
+            streamifier.createReadStream(buffer).pipe(
+                cloudinary.uploader.upload_stream(
+                    transformationOptions,
+                    function (error, result) {
+                        clearTimeout(timeout)
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(result);
+                        }
                     }
-                }
+                )
             )
-        )
-    })
+        })
+    };
+
+    let originalTransformationOptions = { 
+        folder: "wheres-waldo", 
+        transformation: [{ width: imgWidth >= 2000 ? 2000 : imgWidth, crop: "scale" }] 
+    };
+
+    let previewTransformationOptions = {
+        folder: "wheres-waldo/previews",
+        transformation: [{ width: 500, crop: "scale" }]
+    };
+
+    const [original, preview] = await Promise.all([
+        upload(bufferImg, originalTransformationOptions),
+        upload(bufferImg, previewTransformationOptions)
+    ]);
+    
+    return { original, preview };
 })
 
 const deleteImg = asyncHandler(async (imgId) => {
