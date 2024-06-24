@@ -37,6 +37,7 @@ export default function useData(){
                 throw new Error(result.message || "Something went wrong")
             }
             const result = await response.json();
+
             setData(result)
             return result;
         } catch (error) {

@@ -54,7 +54,7 @@ export default function Games(){
                             <div>
                                 <h3>{game.title}</h3>
                                 {game.author && <h5>by {game.author.username} / {moment(game.date).format('MMM Do, YYYY')}</h5>}
-                                <img src={game.image.url} style={{ width: 'auto', height: '120px', borderRadius: '5px' }} alt="" />
+                                <img src={ game.image.preview && game.image.preview.url || game.image.url } style={{ width: 'auto', height: '120px', borderRadius: '5px' }} alt="" />
                             </div>
                         </div>
                         <div className={styles.scoreboard}>

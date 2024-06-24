@@ -83,7 +83,6 @@ export default function Game({ data, mode = 'play' }){
     }
 
     function handleDeleteCharacter(idx){
-        console.log(idx)
         setCharacters((prev) => {
             const newArray = [...prev];
             newArray.splice(idx, 1)
@@ -97,7 +96,7 @@ export default function Game({ data, mode = 'play' }){
     }
 
     useEffect(() => {
-        setImg(data.image.url)
+        setImg(data.image.original && data.image.original.url || data.image.url)
         setTitle(data.title)
         if(mode == 'play'){
             setCharacters(data.characters.map(character => ({ ...character, found: false })))
