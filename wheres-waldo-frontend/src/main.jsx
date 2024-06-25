@@ -11,6 +11,8 @@ import { AuthProvider } from './contexts/authContext'
 import SignUp from './components/SignUp'
 import Login from './components/Login'
 import HomeScreen from './components/HomeScreen'
+import UserInfo from './components/UserInfo'
+import ErrorPage from './components/ErrorPage'
 
 const router = createBrowserRouter([
   {
@@ -19,28 +21,36 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomeScreen />},
       {
-        path: "/games",
+        path: "games",
         element: <Games />
       },
       {
-        path: "/game/:id",
+        path: "game/:id",
         element: <LoadingScreen />,
       },
       {
-        path: "/game-over",
+        path: "game-over",
         element: <GameOver />,
       },
       {
-        path: "/create-game",
+        path: "create-game",
         element: <CreateGame />
       },
       {
-        path: "/login",
+        path: "login",
         element: <Login />
       },
       {
-        path: "/sign-up",
+        path: "sign-up",
         element: <SignUp />
+      },
+      {
+        path: "user/:id",
+        element: <UserInfo />
+      }, 
+      {
+        path: "*",
+        element: <ErrorPage />
       }
     ]
   },

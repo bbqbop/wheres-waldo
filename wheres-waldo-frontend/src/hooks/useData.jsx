@@ -5,15 +5,8 @@ export default function useData(){
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [data, setData] = useState(null);
-    const [token, setToken] = useState(null)
 
     const { isLoggedIn } = useAuth();
-
-    useEffect(() => {
-        if (isLoggedIn) {
-            setToken(localStorage.getItem("token"))
-        }
-    }, [isLoggedIn]);
 
     const server = import.meta.env.VITE_SERVER
 
@@ -23,21 +16,21 @@ export default function useData(){
         setData(null)
         try {
             const isFormData = data instanceof FormData;
+            const headers = {};
+            if (isLoggedIn) headers["Authorization"] = `Bearer ${localStorage.getItem("token")}`;
+            if (!isFormData) headers["Content-Type"] = "application/json";
+            
             const response = await fetch(`${server}${url}`, {
                 method: method,
                 mode: "cors",
-                headers: isFormData && isLoggedIn || method == "DELETE" && isLoggedIn 
-                            ? {"Authorization": `Bearer ${token}`} 
-                            : isFormData 
-                                ? {} 
-                                : { "Content-Type": "application/json"},
+                headers: headers,
                 body: method == "DELETE" ? null : isFormData ? data : JSON.stringify(data)
             });
+
             if (!response.ok){
-                throw new Error(result.message || "Something went wrong")
+                throw new Error(response.status + ': ' + response.statusText || "Something went wrong")
             }
             const result = await response.json();
-
             setData(result)
             return result;
         } catch (error) {
@@ -53,13 +46,20 @@ export default function useData(){
         setError(null);
         setData(null)
         try {
+            const headers = {}
+            if (isLoggedIn || localStorage.user) headers["Authorization"] = `Bearer ${localStorage.getItem("token")}`;
             const response = await fetch(server + url, {
-                mode: 'cors'
+                mode: 'cors',
+                headers: headers,
             })
+            if (!response.ok) {
+                console.log(response)
+                throw new Error("Something went wrong");
+            }
             const result = await response.json()
             setData(result)
             return true
-        } catch(error) {
+        } catch (error) {
             setError(error)
             return false
         } finally {

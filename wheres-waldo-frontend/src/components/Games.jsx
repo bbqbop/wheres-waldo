@@ -35,40 +35,39 @@ export default function Games(){
 
     return (
         <div className={styles.games}>
-            {loading ? (
-                <h2>...loading</h2>
-            ) : error ? (
-                <h2>{error.message}</h2>
-            ) : !data || data.games.length === 0 ? (
-                <h2>No Games Yet</h2>
-            ) : (
-                data.games.map((game, idx) => (
-                    <div className={styles.game}>
-                    {isAdmin && <button onClick={(e) => {
-                        e.stopPropagation()
-                        deleteEntry(game._id)
+            {   
+                data && data.games.length == 0 ? (
+                    <h2>No games yet</h2>
+                ) : 
+                data && data.games.length >= 1 && data.games.map((game, idx) => (
+                    <div className={styles.game} key={idx}>
+                        {isAdmin && <button onClick={(e) => {
+                            e.stopPropagation()
+                            deleteEntry(game._id)
 
-                        }}>Delete</button>}
-                    <Link to={`/game/${game._id}`}  id={game.title} key={game._id}>
-                        <div>
+                            }}>Delete</button>}
+                        <Link to={`/game/${game._id}`} id={game.title} key={game._id}>
                             <div>
-                                <h3>{game.title}</h3>
-                                {game.author && <h5>by {game.author.username} / {moment(game.date).format('MMM Do, YYYY')}</h5>}
-                                <img src={ game.image.preview && game.image.preview.url || game.image.url } style={{ width: 'auto', height: '120px', borderRadius: '5px' }} alt="" />
+                                <div>
+                                    <h3>{game.title}</h3>
+                                    {game.author && <h5>by {game.author.username} / {moment(game.date).format('MMM Do, YYYY')}</h5>}
+                                    <img src={ game.image.preview && game.image.preview.url || game.image.url } style={{ width: 'auto', height: '120px', borderRadius: '5px' }} alt="" />
+                                </div>
                             </div>
-                        </div>
-                        <div className={styles.scoreboard}>
-                            <ol>
-                                {game.scores.length >= 1 ? <b>TOP 3</b> : <b>No scores yet</b>}
-                                {findTopThreeScores(game.scores).map((score, index) => (
-                                    <li key={index}>{score.username}: {score.score}</li>
-                                ))}
-                            </ol>
-                        </div>
-                    </Link>
+                            <div className={styles.scoreboard}>
+                                <ol>
+                                    {game.scores.length >= 1 ? <b>TOP 3</b> : <b>No scores yet</b>}
+                                    {findTopThreeScores(game.scores).map((score, index) => (
+                                        <li key={index}>{score.username}: {score.score}</li>
+                                    ))}
+                                </ol>
+                            </div>
+                        </Link>
                     </div>
                 ))
-            )}
+            }
+            {loading && <p>Loading...</p>}
+            {error && <p>{error.message}</p>} 
         </div>
-    );
+    )
 }
