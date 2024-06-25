@@ -13,6 +13,7 @@ import Login from './components/Login'
 import HomeScreen from './components/HomeScreen'
 import UserInfo from './components/UserInfo'
 import ErrorPage from './components/ErrorPage'
+import ChangePassword from './components/ChangePassword'
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
         path: "user/:id",
         element: <UserInfo />
       }, 
+      {
+        path: "user/:id/change-password",
+        element: <ChangePassword />
+      },
       {
         path: "*",
         element: <ErrorPage />

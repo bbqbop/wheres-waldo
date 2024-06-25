@@ -30,7 +30,8 @@ exports.signUp = asyncHandler(async(req, res) => {
         user: {
             firstname: user.firstname, 
             lastname: user.lastname,
-            username: user.username
+            username: user.username,
+            _id: user._id
         }
     })
 })
@@ -55,8 +56,49 @@ exports.login = asyncHandler(async (req, res) => {
             firstname: user.firstname, 
             lastname: user.lastname,
             username: user.username,
-            id: user._id,
+            _id: user._id,
             isAdmin: user.isAdmin
         }
+    })
+})
+
+exports.read = asyncHandler(async (req, res) => {
+    if(req.user._id != req.params.id){
+        return res.status(401).json({ error: "Authentication failed. Accessing wrong user information" })
+    };
+    const user = await User.findById(req.user._id);
+
+    res.json({ message: 'User information fetched.', user })
+})
+
+exports.update = asyncHandler(async (req, res) => {
+    if(req.user._id != req.params.id){
+        return res.status(401).json({ error: "Authentication failed. Accessing wrong user information" })
+    };
+
+    const user = await User.findByIdAndUpdate(req.user._id, req.body, { new: true })
+
+    res.json({ message: 'User information updated successfully', user})
+})
+
+exports.updatePassword = asyncHandler(async (req, res) => {
+    if(req.user._id != req.params.id){
+        return res.status(401).json({ error: "Authentication failed. Accessing wrong user information" })
+    };
+
+    const user = await User.findById(req.user._id)
+
+    const match = await verifyPassword(req.body.oldPassword, user.password)
+    if (!match) {
+        return res.status(401).json({ error: "Authentication failed. Password incorrect."})
+    }
+
+    user.password = await generatePassword(req.body.newPassword)
+
+    const result = await user.save()
+    
+    res.json({
+        message: "Password updated successfully.",
+        user
     })
 })

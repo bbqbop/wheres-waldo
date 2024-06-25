@@ -28,7 +28,7 @@ export default function useData(){
             });
 
             if (!response.ok){
-                throw new Error(response.status + ': ' + response.statusText || "Something went wrong")
+                throw new Error(response.message || response.status + ': ' + response.statusText || "Something went wrong")
             }
             const result = await response.json();
             setData(result)
@@ -48,13 +48,13 @@ export default function useData(){
         try {
             const headers = {}
             if (isLoggedIn || localStorage.user) headers["Authorization"] = `Bearer ${localStorage.getItem("token")}`;
+
             const response = await fetch(server + url, {
                 mode: 'cors',
                 headers: headers,
             })
-            if (!response.ok) {
-                console.log(response)
-                throw new Error("Something went wrong");
+            if (!response.ok){
+                throw new Error(response.message || response.status + ': ' + response.statusText || "Something went wrong")
             }
             const result = await response.json()
             setData(result)

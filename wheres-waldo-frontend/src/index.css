@@ -18,6 +18,8 @@ a {
   color: #646cff;
   text-decoration: inherit;
   cursor: pointer;
+  padding: 12px 12px;
+
 }
 a:hover {
   color: black;
@@ -70,6 +72,7 @@ button:focus-visible {
 
 hr {
   width: 100%;
+  margin: 10px;
 }
 
 ol {
@@ -77,4 +80,64 @@ ol {
   flex-direction: column;
   align-items: center;
   padding: 20px;
+}
+
+table {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px;
+}
+
+tbody tr:first-child th:first-child,
+tbody tr:first-child td:first-child {
+  border-top-left-radius: 10px;
+}
+
+tbody tr:first-child th:last-child,
+tbody tr:first-child td:last-child {
+  border-top-right-radius: 10px;
+}
+
+tbody tr:last-child th:first-child,
+tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 10px;
+}
+
+tbody tr:last-child th:last-child,
+tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
+}
+
+tr th {
+  font-size: 18px;
+  padding: 12px;
+  border: 1px solid #eeeeee;
+  text-align: left;
+  background-color: rgba(100, 108, 255, 0.2);
+}
+
+tr td {
+  border: 1px solid #eeeeee;
+  text-align: left;
+}
+
+
+input {
+  font-size: 16px;
+  background-color: transparent;
+  border: none;
+  width: 91%;
+  padding: 12px 12px;
+  font-family: 'Poppins', sans-serif;
+}
+
+input:hover {
+  background-color: #fffaf3;
+}
+
+input:focus {
+  outline: 1px solid #ccc;
+  border: 1px solid #ccc;
 }
